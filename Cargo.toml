@@ -1,0 +1,7 @@
+[package]
+name = "montyman"
+version = "0.1.0"
+authors = ["Edward Bennigsen <edward.bennigsen@protonmail.com>"]
+
+[dependencies]
+nineman = { path = "../nineman" }
