@@ -8,6 +8,7 @@ use nineman::player::RandomInput;
 use nineman::player::InputHandler;
 
 use montyman::monty_input::MontyInput;
+use montyman::game_state::GameState;
 
 fn main() {
     let p1 = Player::new(String::from("Ruth"), 1, Box::new(RandomInput {}));
@@ -19,5 +20,9 @@ fn main() {
     println!("{:?}", game);
     println!();
 
+    let game_state = GameState::at_start(&game.board);
+
     game.game_loop();
+
+    println!("winner: {:?}", game_state.winner());
 }
