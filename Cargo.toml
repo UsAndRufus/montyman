@@ -5,3 +5,5 @@ authors = ["Edward Bennigsen <edward.bennigsen@protonmail.com>"]
 
 [dependencies]
 nineman = { path = "../nineman" }
+indextree = "1.1.0"
+rand = "0.4.1"
