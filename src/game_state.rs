@@ -1,4 +1,5 @@
 use nineman::board::Board;
+use nineman::game::Game;
 use nineman::player;
 
 pub struct GameState {
@@ -11,14 +12,14 @@ pub struct GameState {
 }
 
 impl GameState {
-    pub fn at_start(board: &Board) -> Self {
+    pub fn from_game(game: &Game) -> Self {
         GameState {
-            board: board.clone(),
-            current_player: 1,
-            player1_score: player::STARTING_SCORE,
-            player2_score: player::STARTING_SCORE,
-            player1_pieces_to_place: player::STARTING_PIECES,
-            player2_pieces_to_place: player::STARTING_PIECES,
+            board: game.board.clone(),
+            current_player: game.get_current_player_id(),
+            player1_score: game.player1.score(),
+            player2_score: game.player2.score(),
+            player1_pieces_to_place: game.player1.get_pieces_left_to_place(),
+            player2_pieces_to_place: game.player1.get_pieces_left_to_place(),
         }
     }
 

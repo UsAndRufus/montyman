@@ -5,7 +5,6 @@ use nineman::game::Game;
 use nineman::player::Player;
 use nineman::player::HumanInput;
 use nineman::player::RandomInput;
-use nineman::player::InputHandler;
 
 use montyman::monty_input::MontyInput;
 use montyman::game_state::GameState;
@@ -20,7 +19,7 @@ fn main() {
     println!("{:?}", game);
     println!();
 
-    let game_state = GameState::at_start(&game.board);
+    let game_state = GameState::from_game(&game);
 
     game.game_loop();
 
