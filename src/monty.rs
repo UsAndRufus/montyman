@@ -16,28 +16,50 @@ pub struct Monty {
 
 impl Monty {
 
-    fn mcts(&self) -> String {
+    fn mcts(&mut self) -> PlyType {
         for _ in 1..NUMBER_OF_SIMULATIONS {
-
+            let node_to_expand = self.select(self.root.unwrap());
+            let new_node = self.expand(node_to_expand);
+            let payoff = self.simulate(new_node);
+            self.update(new_node, payoff);
         }
 
-        "".to_string()
+        Placement{player_id: 1, piece_id: "".to_string()}
     }
 
-    fn select(&self) {
-
+    // Recursively traverse from node, looking for most important expandable node
+    // Return when you reach non-expandable node
+    fn select(&self, node_id: NodeId) -> NodeId {
+        node_id
     }
 
-    fn expand(&self) {
-
+    // Node is expandable if it is non-terminal and has univisited children
+    fn is_expandable(&self, node_id: NodeId) -> bool {
+        self.tree[node_id].first_child().is_none()
     }
 
-    fn simulate(&self) {
-
+    // Called when seleciton finishes
+    // Choose random unvisited child to add to the tree
+    fn expand(&mut self, node_id: NodeId) -> NodeId {
+        node_id
     }
 
-    fn update(&self) {
 
+    // Random playout on new node
+    // Play until the end
+    // Return 1 for win, 0 for lose
+    fn simulate(&self, node_id: NodeId) -> i8 {
+        0
+    }
+
+    // Back-propogate value from simulation to new node and ancestors
+    fn update(&mut self, node_id: NodeId, payoff: i8) {
+        let ancestor_ids: Vec<_> = node_id.ancestors(&self.tree).collect();
+
+        for ancestor_id in ancestor_ids {
+            let ancestor = &mut self.tree[ancestor_id];
+            ancestor.data.visit(payoff);
+        }
     }
 
     fn create_children(&mut self, node: NodeId) {
@@ -49,7 +71,7 @@ impl Monty {
         }
     }
 
-    fn random_placement(&self, available_places: Vec<String>) -> String {
+    fn random_placement(&self) -> PlyType {
         let children: Vec<&GameState>
             = self.root.unwrap().children(&self.tree)
                         .map(|c| &self.tree[c])
@@ -57,17 +79,7 @@ impl Monty {
                         .map(|s| &s.game_state)
                         .collect();
 
-        // Completely random choice for now!
-        let chosen: PlyType = thread_rng().choose(&children).unwrap().ply_to_get_here.clone();
-
-        match chosen {
-            Placement {player_id, piece_id} => {
-                assert!(available_places.contains(&piece_id),
-                    format!("available_places: {:?}, piece_id: {}", available_places, piece_id));
-                piece_id
-            },
-            _ => panic!("Moved from a placement node using {:?}", chosen),
-        }
+        thread_rng().choose(&children).unwrap().ply_to_get_here.clone()
     }
 }
 
@@ -81,15 +93,25 @@ impl InputHandler for Monty {
         self.create_children(root);
     }
 
-    fn get_placement(&self, available_places: Vec<String>) -> String {
-        self.random_placement(available_places)
+    fn get_placement(&mut self, available_places: Vec<String>) -> String {
+        //let chosen = self.random_placement(available_places);
+        let chosen = self.mcts();
+
+        match chosen {
+            Placement {piece_id, ..} => {
+                assert!(available_places.contains(&piece_id),
+                    format!("available_places: {:?}, piece_id: {}", available_places, piece_id));
+                piece_id
+            },
+            _ => panic!("Moved from a placement node using {:?}", chosen),
+        }
     }
 
-    fn get_move(&self, available_moves: Vec<(String, String)>) -> (String, String) {
+    fn get_move(&mut self, available_moves: Vec<(String, String)>) -> (String, String) {
         thread_rng().choose(&available_moves).unwrap().to_owned()
     }
 
-    fn get_mill(&self, available_mills: Vec<String>) -> String {
+    fn get_mill(&mut self, available_mills: Vec<String>) -> String {
         thread_rng().choose(&available_mills).unwrap().to_string()
     }
 
