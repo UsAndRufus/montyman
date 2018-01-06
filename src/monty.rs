@@ -2,9 +2,9 @@ use rand::{thread_rng, Rng};
 
 use nineman::player::InputHandler;
 
-pub struct MontyInput {}
+pub struct Monty {}
 
-impl InputHandler for MontyInput {
+impl InputHandler for Monty {
     fn get_placement(&self, available_places: Vec<String>) -> String {
         thread_rng().choose(&available_places).unwrap().to_string()
     }

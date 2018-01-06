@@ -1,3 +1,5 @@
+use std::fmt;
+
 use nineman::board::Board;
 use nineman::game::Game;
 use nineman::player;
@@ -33,5 +35,16 @@ impl GameState {
         }
 
         None
+    }
+}
+
+impl fmt::Debug for GameState {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+        return write!(f, "GameState(current_player: {}; p1: (s:{},p:{}), p2: (s:{},p:{}))",
+                    self.current_player,
+                    self.player1_score, self.player1_pieces_to_place,
+                    self.player2_score, self.player2_pieces_to_place);
+
     }
 }

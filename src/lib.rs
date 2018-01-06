@@ -2,5 +2,7 @@ extern crate nineman;
 extern crate indextree;
 extern crate rand;
 
-pub mod monty_input;
+mod monty;
 pub mod game_state;
+
+pub use monty::Monty;
