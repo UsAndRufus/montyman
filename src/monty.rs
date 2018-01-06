@@ -2,7 +2,7 @@ use rand::{thread_rng, Rng};
 use indextree::*;
 
 use nineman::game::*;
-use nineman::game::MoveType::*;
+use nineman::game::PlyType::*;
 use nineman::player::InputHandler;
 
 pub struct Monty {
@@ -11,6 +11,11 @@ pub struct Monty {
 }
 
 impl Monty {
+
+    fn mcts(&self) -> String {
+        "".to_string()
+    }
+
     fn select(&self) {
 
     }
@@ -35,6 +40,25 @@ impl Monty {
             node.append(new_node, &mut self.tree);
         }
     }
+
+    fn random_placement(&self, available_places: Vec<String>) -> String {
+        let children: Vec<&GameState>
+            = self.root.unwrap().children(&self.tree)
+                        .map(|c| &self.tree[c])
+                        .map(|n| &n.data)
+                        .collect();
+
+        // Completely random choice for now!
+        let chosen: PlyType = thread_rng().choose(&children).unwrap().move_to_get_here.clone();
+
+        match chosen {
+            Placement {player_id, piece_id} => {
+                assert!(available_places.contains(&piece_id));
+                piece_id
+            },
+            _ => panic!("Moved from a placement node using {:?}", chosen),
+        }
+    }
 }
 
 impl InputHandler for Monty {
@@ -47,23 +71,7 @@ impl InputHandler for Monty {
     }
 
     fn get_placement(&self, available_places: Vec<String>) -> String {
-
-        let children: Vec<&GameState>
-            = self.root.unwrap().children(&self.tree)
-                        .map(|c| &self.tree[c])
-                        .map(|n| &n.data)
-                        .collect();
-
-        // Completely random choice for now!
-        let chosen: MoveType = thread_rng().choose(&children).unwrap().move_to_get_here.clone();
-
-        match chosen {
-            Placement {player_id, piece_id} => {
-                assert!(available_places.contains(&piece_id));
-                piece_id
-            },
-            _ => panic!("Moved from a placement node using {:?}", chosen),
-        }
+        self.random_placement(available_places)
     }
 
     fn get_move(&self, available_moves: Vec<(String, String)>) -> (String, String) {
