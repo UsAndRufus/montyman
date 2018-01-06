@@ -1,26 +1,23 @@
 use rand::{thread_rng, Rng};
-use indextree::Arena;
+use indextree::*;
 
-use std::cell::RefCell;
-
-use nineman::game::Game;
+use nineman::game::*;
 use nineman::player::InputHandler;
 
-use game_state::GameState;
-
 pub struct Monty {
-    pub tree: RefCell<Arena<GameState>>,
+    pub tree: Arena<GameState>,
+    pub root: Option<NodeId>,
 }
 
 impl Monty {
 }
 
 impl InputHandler for Monty {
-    fn update_game(&self, game: &Game) {
+    fn update_game_state(&mut self, game_state: GameState) {
         let mut tree = Arena::new();
-        let game_state = GameState::from_game(game);
-        tree.new_node(game_state);
-        *self.tree.borrow_mut() = tree;
+        let root = tree.new_node(game_state);
+        self.tree = tree;
+        self.root = Some(root);
     }
 
     fn get_placement(&self, available_places: Vec<String>) -> String {
@@ -36,6 +33,6 @@ impl InputHandler for Monty {
     }
 
     fn to_string(&self) -> String {
-        format!("Monty InputHandler: {:?}", self.tree.borrow())
+        format!("Monty InputHandler: {:?}", self.tree)
     }
 }

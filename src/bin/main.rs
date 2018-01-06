@@ -2,23 +2,20 @@ extern crate montyman;
 extern crate nineman;
 extern crate indextree;
 
-use std::cell::RefCell;
-use std::mem;
-
 use nineman::game::Game;
 use nineman::player::Player;
 use nineman::player::Human;
 use nineman::player::Random;
 
 use montyman::Monty;
-use montyman::game_state::GameState;
 
 use indextree::Arena;
 
 fn main() {
     let p1 = Player::new(String::from("Ruth"), 1, Box::new(Random {}));
 
-    let p2 = Player::new(String::from("Monty"), 2, Box::new(Monty {tree: RefCell::new(Arena::new())}));
+    let p2 = Player::new(String::from("Monty"), 2,
+                            Box::new(Monty { tree: Arena::new(), root: None}));
 
     let mut game = Game::new(p1, p2);
 
