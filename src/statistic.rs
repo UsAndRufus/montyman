@@ -1,9 +1,10 @@
+use std::cmp::Ordering;
+
 use nineman::game::*;
 
-// 1/root(2)
 const UCT_CONST: f32 = 0.70710678118654752;
 
-#[derive(Debug)]
+#[derive(Debug, Eq)]
 pub struct Statistic {
     times_visited: i8,
     sum_of_payoffs_received: i8,
@@ -44,5 +45,34 @@ impl Statistic {
 
     pub fn sum_of_payoffs_received_f(&self) -> f32 {
         self.sum_of_payoffs_received as f32
+    }
+
+    pub fn times_visited(&self) -> i8 {
+        self.times_visited
+    }
+
+    pub fn sum_of_payoffs_received_(&self) -> i8 {
+        self.sum_of_payoffs_received
+    }
+}
+
+// Currently implementing these as robust
+// i.e. a Statistic is bigger than another if it has been visited more
+
+impl Ord for Statistic {
+    fn cmp(&self, other: &Statistic) -> Ordering {
+        self.times_visited.cmp(&other.times_visited())
+    }
+}
+
+impl PartialOrd for Statistic {
+     fn partial_cmp(&self, other: &Statistic) -> Option<Ordering> {
+         Some(self.cmp(other))
+     }
+}
+
+impl PartialEq for Statistic {
+    fn eq(&self, other: &Statistic) -> bool {
+        self.times_visited == other.times_visited()
     }
 }

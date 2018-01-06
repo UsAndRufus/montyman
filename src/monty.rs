@@ -24,7 +24,7 @@ impl Monty {
             self.update(new_node, payoff);
         }
 
-        Placement{player_id: 1, piece_id: "".to_string()}
+        self.best_move()
     }
 
     // Recursively traverse from node, looking for most important expandable node
@@ -41,7 +41,16 @@ impl Monty {
     // Called when seleciton finishes
     // Choose random unvisited child to add to the tree
     fn expand(&mut self, node_id: NodeId) -> NodeId {
-        node_id
+        let child_gs;
+        {
+            let node = &self.tree[node_id];
+
+            child_gs = thread_rng().choose(&node.data.game_state.children()).unwrap().clone();
+        }
+
+        let child_statistic = Statistic::new(child_gs);
+        self.tree.new_node(child_statistic)
+
     }
 
 
@@ -60,6 +69,18 @@ impl Monty {
             let ancestor = &mut self.tree[ancestor_id];
             ancestor.data.visit(payoff);
         }
+    }
+
+    // End the search and make a move
+    // Currently using most robust child (most visited)
+    fn best_move(&self) -> PlyType {
+        let best_statistic =
+            self.root.unwrap().children(&self.tree)
+                .map(|c| &self.tree[c])
+                .map(|c| &c.data)
+                .max()
+                .unwrap();
+        best_statistic.game_state.ply_to_get_here.clone()
     }
 
     fn create_children(&mut self, node: NodeId) {
