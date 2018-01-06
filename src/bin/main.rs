@@ -24,8 +24,8 @@ fn main() {
 
     game.game_loop();
 
-    println!("player1: {:?}, player2: {:?}",
-                game.player1.input_handler.to_string(), game.player2.input_handler.to_string());
+    //println!("player1: {:?}, player2: {:?}",
+    //            game.player1.input_handler.to_string(), game.player2.input_handler.to_string());
 
 
 }
