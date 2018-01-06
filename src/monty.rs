@@ -5,14 +5,22 @@ use nineman::game::*;
 use nineman::game::PlyType::*;
 use nineman::player::InputHandler;
 
+use statistic::Statistic;
+
+const NUMBER_OF_SIMULATIONS: i8 = 10;
+
 pub struct Monty {
-    pub tree: Arena<GameState>,
+    pub tree: Arena<Statistic>,
     pub root: Option<NodeId>,
 }
 
 impl Monty {
 
     fn mcts(&self) -> String {
+        for _ in 1..NUMBER_OF_SIMULATIONS {
+
+        }
+
         "".to_string()
     }
 
@@ -33,10 +41,10 @@ impl Monty {
     }
 
     fn create_children(&mut self, node: NodeId) {
-        let children = self.tree[node].data.children();
+        let children = self.tree[node].data.game_state.children();
 
         for child in children {
-            let new_node = self.tree.new_node(child);
+            let new_node = self.tree.new_node(Statistic::new(child));
             node.append(new_node, &mut self.tree);
         }
     }
@@ -46,14 +54,16 @@ impl Monty {
             = self.root.unwrap().children(&self.tree)
                         .map(|c| &self.tree[c])
                         .map(|n| &n.data)
+                        .map(|s| &s.game_state)
                         .collect();
 
         // Completely random choice for now!
-        let chosen: PlyType = thread_rng().choose(&children).unwrap().move_to_get_here.clone();
+        let chosen: PlyType = thread_rng().choose(&children).unwrap().ply_to_get_here.clone();
 
         match chosen {
             Placement {player_id, piece_id} => {
-                assert!(available_places.contains(&piece_id));
+                assert!(available_places.contains(&piece_id),
+                    format!("available_places: {:?}, piece_id: {}", available_places, piece_id));
                 piece_id
             },
             _ => panic!("Moved from a placement node using {:?}", chosen),
@@ -64,7 +74,8 @@ impl Monty {
 impl InputHandler for Monty {
     fn update_game_state(&mut self, game_state: GameState) {
         let mut tree = Arena::new();
-        let root = tree.new_node(game_state);
+        let statistic = Statistic::new(game_state);
+        let root = tree.new_node(statistic);
         self.tree = tree;
         self.root = Some(root);
         self.create_children(root);
