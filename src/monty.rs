@@ -12,6 +12,7 @@ const NUMBER_OF_SIMULATIONS: i8 = 10;
 pub struct Monty {
     pub tree: Arena<Statistic>,
     pub root: Option<NodeId>,
+    pub player_id: i8,
 }
 
 impl Monty {
@@ -58,7 +59,26 @@ impl Monty {
     // Play until the end
     // Return 1 for win, 0 for lose
     fn simulate(&self, node_id: NodeId) -> i8 {
-        0
+        let mut game_state = self.tree[node_id].data.game_state.clone();
+
+        loop {
+            let winner = game_state.winner();
+
+            match winner {
+                Some(who) => {
+                    if who == self.player_id {
+                        break 1
+                    } else {
+                        break 0
+                    }
+                },
+                None => {
+                    // TODO: currently breaks here because we never have children beyond placement
+                    let new = thread_rng().choose(&game_state.children()).unwrap().clone();
+                    game_state = new;
+                }
+            }
+        }
     }
 
     // Back-propogate value from simulation to new node and ancestors
@@ -121,7 +141,7 @@ impl InputHandler for Monty {
         match chosen {
             Placement {piece_id, ..} => {
                 assert!(available_places.contains(&piece_id),
-                    format!("available_places: {:?}, piece_id: {}", available_places, piece_id));
+                    format!("Placement impossible: available_places: {:?}, piece_id: {}", available_places, piece_id));
                 piece_id
             },
             _ => panic!("Moved from a placement node using {:?}", chosen),
@@ -138,5 +158,9 @@ impl InputHandler for Monty {
 
     fn to_string(&self) -> String {
         format!("Monty InputHandler: {:?}", self.tree)
+    }
+
+    fn set_player_id(&mut self, player_id: i8) {
+        self.player_id = player_id;
     }
 }
