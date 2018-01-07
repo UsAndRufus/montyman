@@ -62,6 +62,9 @@ impl Monty {
         let mut game_state = self.tree[node_id].data.game_state.clone();
 
         loop {
+            assert!(!(game_state.ply_to_get_here.is_mill() && game_state.next_ply.is_mill()),
+                        "Got here from a mill and next move is a mill: {:?}", game_state);
+
             let winner = game_state.winner();
 
             match winner {

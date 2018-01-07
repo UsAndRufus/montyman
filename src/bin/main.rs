@@ -15,7 +15,7 @@ fn main() {
     let p1 = Player::new(String::from("Ruth"), 1, Box::new(Random {}));
 
     let p2 = Player::new(String::from("Monty"), 2,
-                            Box::new(Monty { tree: Arena::new(), root: None, player_id: 0}));
+                            Box::new(Monty { tree: Arena::new(), root: None, player_id: 2}));
 
     let mut game = Game::new(p1, p2);
 
