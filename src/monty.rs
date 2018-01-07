@@ -65,6 +65,8 @@ impl Monty {
             assert!(!(game_state.ply_to_get_here.is_mill() && game_state.next_ply.is_mill()),
                         "Got here from a mill and next move is a mill: {:?}", game_state);
 
+            //println!("{:?}", game_state);
+
             let winner = game_state.winner();
 
             match winner {
@@ -77,10 +79,14 @@ impl Monty {
                 },
                 None => {
                     // TODO: currently breaks here because we never have children beyond placement
-                    let new = thread_rng().choose(&game_state.children())
-                                .expect(&format!("Failed to get random child from GameState: {:?}", &game_state))
-                                .clone();
-                    game_state = new;
+
+                    let new_game_state = thread_rng().choose(&game_state.children()).cloned();
+
+
+                    match new_game_state {
+                        Some(new) => game_state = new,
+                        None => break 0, // Cannot move so have lost the game
+                    }
                 }
             }
         }
