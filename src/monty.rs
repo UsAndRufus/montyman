@@ -2,7 +2,7 @@ use rand::{thread_rng, Rng};
 use indextree::*;
 
 use nineman::game::*;
-use nineman::game::PlyType::*;
+use nineman::game::Ply::*;
 use nineman::player::InputHandler;
 
 use statistic::Statistic;
@@ -17,7 +17,7 @@ pub struct Monty {
 
 impl Monty {
 
-    fn mcts(&mut self) -> PlyType {
+    fn mcts(&mut self) -> Ply {
         for _ in 1..NUMBER_OF_SIMULATIONS {
             let node_to_expand = self.select(self.root.unwrap());
             let new_node = self.expand(node_to_expand);
@@ -93,7 +93,7 @@ impl Monty {
 
     // End the search and make a move
     // Currently using most robust child (most visited)
-    fn best_move(&self) -> PlyType {
+    fn best_move(&self) -> Ply {
         let best_statistic =
             self.root.unwrap().children(&self.tree)
                 .map(|c| &self.tree[c])
@@ -112,7 +112,7 @@ impl Monty {
         }
     }
 
-    fn random_placement(&self) -> PlyType {
+    fn random_placement(&self) -> Ply {
         let children: Vec<&GameState>
             = self.root.unwrap().children(&self.tree)
                         .map(|c| &self.tree[c])
