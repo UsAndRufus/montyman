@@ -74,7 +74,9 @@ impl Monty {
                 },
                 None => {
                     // TODO: currently breaks here because we never have children beyond placement
-                    let new = thread_rng().choose(&game_state.children()).unwrap().clone();
+                    let new = thread_rng().choose(&game_state.children())
+                                .expect(&format!("Failed to get random child from GameState: {:?}", &game_state))
+                                .clone();
                     game_state = new;
                 }
             }
