@@ -26,7 +26,8 @@ impl Statistic {
         self.times_visited += 1;
     }
 
-    pub fn uct(&self, child: &Statistic) -> f32 {
+    // this returns an integer as a hack so we can hash on it
+    pub fn uct(&self, child: &Statistic) -> i64 {
         let average_payoff = child.sum_of_payoffs_received_f() /
                              child.times_visited_f();
 
@@ -35,7 +36,7 @@ impl Statistic {
 
         let root_term = UCT_CONST * ln_term.sqrt();
 
-        average_payoff + root_term
+        ((average_payoff + root_term) * 100000.0) as i64
 
     }
 

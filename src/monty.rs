@@ -1,5 +1,6 @@
 use rand::{thread_rng, Rng};
 use indextree::*;
+use std::collections::HashMap;
 
 use nineman::game::*;
 use nineman::game::Ply::*;
@@ -7,7 +8,7 @@ use nineman::player::InputHandler;
 
 use statistic::Statistic;
 
-const NUMBER_OF_SIMULATIONS: i8 = 10;
+const NUMBER_OF_SIMULATIONS: i16 = 100;
 
 pub struct Monty {
     pub tree: Arena<Statistic>,
@@ -18,11 +19,17 @@ pub struct Monty {
 impl Monty {
 
     fn mcts(&mut self) -> Ply {
-        for _ in 1..NUMBER_OF_SIMULATIONS {
-            let node_to_expand = self.select(self.root.unwrap());
+        println!("Monty is thinking...");
+        for i in 1..NUMBER_OF_SIMULATIONS {
+            let root = self.root.unwrap();
+            let node_to_expand = self.select(root);
             let new_node = self.expand(node_to_expand);
             let payoff = self.simulate(new_node);
             self.update(new_node, payoff);
+
+            if i % 10 == 0 {
+                println!("{}",i);
+            }
         }
 
         self.best_move()
@@ -30,8 +37,22 @@ impl Monty {
 
     // Recursively traverse from node, looking for most important expandable node
     // Return when you reach non-expandable node
-    fn select(&self, node_id: NodeId) -> NodeId {
-        node_id
+    // NB: not convinced I have this right, it seems counter-intuitive.
+    // Seems like you will never visit unvisited children of expanded nodes, i.e. you only ever look at leaf nodes?
+    fn select(&mut self, node_id: NodeId) -> NodeId {
+        if self.is_expandable(node_id) {
+            self.expand(node_id)
+        } else {
+            let parent = &self.tree[node_id].data;
+            let children: HashMap<_,_>
+                = node_id.children(&self.tree)
+                    .map(|c| (parent.uct(&self.tree[c].data), c))
+                    .collect();
+
+            let max = children.keys().max().unwrap();
+
+            children.get(max).unwrap().clone()
+        }
     }
 
     // Node is expandable if it is non-terminal and has univisited children
@@ -160,11 +181,33 @@ impl InputHandler for Monty {
     }
 
     fn get_move(&mut self, available_moves: Vec<(String, String)>) -> (String, String) {
-        thread_rng().choose(&available_moves).unwrap().to_owned()
+        //thread_rng().choose(&available_moves).unwrap().to_owned()
+
+        let chosen = self.mcts();
+
+        match chosen {
+            Move {mv, ..} => {
+                assert!(available_moves.contains(&mv),
+                    format!("Move impossible: available_moves: {:?}, mv: {:?}", available_moves, mv));
+                mv
+            },
+            _ => panic!("Moved from a move node using {:?}", chosen),
+        }
     }
 
     fn get_mill(&mut self, available_mills: Vec<String>) -> String {
-        thread_rng().choose(&available_mills).unwrap().to_string()
+        //thread_rng().choose(&available_mills).unwrap().to_string()
+
+        let chosen = self.mcts();
+
+        match chosen {
+            Mill {piece_id, ..} => {
+                assert!(available_mills.contains(&piece_id),
+                    format!("Mill impossible: available_mills: {:?}, piece_id: {}", available_mills, piece_id));
+                piece_id
+            },
+            _ => panic!("Moved from a mill node using {:?}", chosen),
+        }
     }
 
     fn to_string(&self) -> String {
