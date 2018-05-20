@@ -1,9 +1,9 @@
 [package]
 name = "montyman"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Edward Bennigsen <edward.bennigsen@protonmail.com>"]
 
 [dependencies]
-nineman = { path = "../nineman" }
+nineman = { git = "https://github.com/UsAndRufus/nineman", tag = "v0.2.1" }
 indextree = "1.1.0"
 rand = "0.4.1"
