@@ -88,7 +88,8 @@ impl Monty {
 
             //println!("{:?}", game_state);
 
-            let winner = game_state.winner();
+            //let winner = game_state.winner();
+            let winner = Some(1);
 
             match winner {
                 Some(who) => {
@@ -201,7 +202,7 @@ impl InputHandler for Monty {
         let chosen = self.mcts();
 
         match chosen {
-            Mill {piece_id, ..} => {
+            Mill {..} => {
                 assert!(available_mills.contains(&chosen),
                     format!("Mill impossible: available_mills: {:?}, chosen: {:?}", available_mills, chosen));
                 chosen

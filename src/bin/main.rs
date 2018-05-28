@@ -12,7 +12,7 @@ use montyman::Monty;
 use indextree::Arena;
 
 fn main() {
-    let p1 = Player::new(String::from("Ruth"), 1, Box::new(Human {}));
+    let p1 = Player::new(String::from("Ruth"), 1, Box::new(Human {player_id: 1}));
 
     let p2 = Player::new(String::from("Monty"), 2,
                             Box::new(Monty { tree: Arena::new(), root: None, player_id: 2}));
