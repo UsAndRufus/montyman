@@ -4,6 +4,6 @@ version = "0.1.1"
 authors = ["Edward Bennigsen <edward.bennigsen@protonmail.com>"]
 
 [dependencies]
-nineman = { git = "https://github.com/UsAndRufus/nineman", tag = "v0.2.1" }
+nineman = { git = "https://github.com/UsAndRufus/nineman", tag = "v0.3.2" }
 indextree = "1.1.0"
 rand = "0.4.1"

@@ -157,7 +157,7 @@ impl Monty {
 }
 
 impl InputHandler for Monty {
-    fn update_game_state(&mut self, game_state: GameState) {
+    fn give_new_game_state(&mut self, game_state: GameState) {
         let mut tree = Arena::new();
         let statistic = Statistic::new(game_state);
         let root = tree.new_node(statistic);
@@ -166,45 +166,45 @@ impl InputHandler for Monty {
         self.create_children(root);
     }
 
-    fn get_placement(&mut self, available_places: Vec<String>) -> String {
+    fn get_placement(&mut self, available_places: Vec<Ply>) -> Ply {
         //let chosen = self.random_placement(available_places);
         let chosen = self.mcts();
 
         match chosen {
-            Placement {piece_id, ..} => {
-                assert!(available_places.contains(&piece_id),
-                    format!("Placement impossible: available_places: {:?}, piece_id: {}", available_places, piece_id));
-                piece_id
+            Placement {..} => {
+                assert!(available_places.contains(&chosen),
+                    format!("Placement impossible: available_places: {:?}, chosen: {:?}", available_places, chosen));
+                chosen
             },
             _ => panic!("Moved from a placement node using {:?}", chosen),
         }
     }
 
-    fn get_move(&mut self, available_moves: Vec<(String, String)>) -> (String, String) {
+    fn get_move(&mut self, available_moves: Vec<Ply>) -> Ply {
         //thread_rng().choose(&available_moves).unwrap().to_owned()
 
         let chosen = self.mcts();
 
         match chosen {
-            Move {mv, ..} => {
-                assert!(available_moves.contains(&mv),
-                    format!("Move impossible: available_moves: {:?}, mv: {:?}", available_moves, mv));
-                mv
+            Move {..} => {
+                assert!(available_moves.contains(&chosen),
+                    format!("Move impossible: available_moves: {:?}, mv: {:?}", available_moves, chosen));
+                chosen
             },
             _ => panic!("Moved from a move node using {:?}", chosen),
         }
     }
 
-    fn get_mill(&mut self, available_mills: Vec<String>) -> String {
+    fn get_mill(&mut self, available_mills: Vec<Ply>) -> Ply {
         //thread_rng().choose(&available_mills).unwrap().to_string()
 
         let chosen = self.mcts();
 
         match chosen {
             Mill {piece_id, ..} => {
-                assert!(available_mills.contains(&piece_id),
-                    format!("Mill impossible: available_mills: {:?}, piece_id: {}", available_mills, piece_id));
-                piece_id
+                assert!(available_mills.contains(&chosen),
+                    format!("Mill impossible: available_mills: {:?}, chosen: {:?}", available_mills, chosen));
+                chosen
             },
             _ => panic!("Moved from a mill node using {:?}", chosen),
         }
