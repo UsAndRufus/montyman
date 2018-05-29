@@ -88,8 +88,7 @@ impl Monty {
 
             //println!("{:?}", game_state);
 
-            //let winner = game_state.winner();
-            let winner = Some(1);
+            let winner = game_state.winner();
 
             match winner {
                 Some(who) => {
